@@ -21,6 +21,7 @@ public class AnemyBattle : MonoBehaviour
         else if(EnemyTurn == false)
         {
             //플레이어의 턴이라도 적은 패턴을 통해 플레이어의 공격에 대응할 것
+            //반가워
         }
     }
 
