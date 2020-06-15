@@ -43,6 +43,7 @@ public class BattleSystem : MonoBehaviour
 
     UIEffect ue;
     Cardsc csc;
+    CardScripts CCode;
 
     void Start()
     {
@@ -54,6 +55,7 @@ public class BattleSystem : MonoBehaviour
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
+        CCode = gameObject.GetComponent<CardScripts>();
         for (int i = 0; i < 10; i++)
         {
             CardImage[i].SetActive(false);
@@ -384,6 +386,11 @@ public class BattleSystem : MonoBehaviour
             rt[8].localPosition = new Vector3(CardPosition - 210, -350, 0);
             rt[9].localPosition = new Vector3(CardPosition - 270, -350, 0);
         }
+    }
+
+    void Field()
+    {
+    CCode.CardCode
     }
 
 
