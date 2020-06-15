@@ -12,19 +12,19 @@ public class CardScripts : MonoBehaviour
     public int MonsterDamageType; //몬스터의 대미지 타입 1:물리2:마법3:고정4:혼합
     }
     
-    CCode spider;
+    public CCode[] CardState = new CCode[100];
 
     void awake()
     {
-    spider.CardCode = 0;
-    spider.MonsterHp = 2;
-    spider.MonstrrPower = 1;
-    spider.MonsterDamageType = 1;
+    CardState[Spider].CardCode = 0;
+    CardState[Spider].MonsterHp = 2;
+    CardState[Spider].MonstrrPower = 1;
+    CardState[Spider].MonsterDamageType = 1;
     }
     
     enum Code
     {
-        Example
+        Spider
     };
     
 }
