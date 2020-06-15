@@ -5,18 +5,18 @@ using UnityEngine.UI;
 
 public class BattleSystem : MonoBehaviour
 {
-    public Text Decktxt; //덱 UI 옆의 텍스트
-    public GameObject[] CardImage = new GameObject[10]; //손패의 카드 오브젝트
+    public Text Decktxt;
+    public GameObject[] CardImage = new GameObject[10];
 
-    public string[] Decks = new string[100]; //게임이 진행되는 동안의 내 덱
+    public string[] Decks = new string[100];
     public int[] DecksCost = new int[100];
     public int[] DecksPower = new int[100];
     public int[] DecksHP = new int[100];
 
-    public string[] BDecks = new string[100]; //전투 속에만 유효한 배틀 덱
-    public int[] BDecksOGCost = new int[100]; //OG: 덱에서 가져온 카드의 본래 값
-    public int[] BDecksRCost = new int[100]; //R: 전투에서 변경될 수 있는 값
-    public int[] BDecksOGPower = new int[100]; //이 값의 비교에 따라 텍스트 색이 변함
+    public string[] BDecks = new string[100];
+    public int[] BDecksOGCost = new int[100];
+    public int[] BDecksRCost = new int[100];
+    public int[] BDecksOGPower = new int[100];
     public int[] BDecksRPower = new int[100];
     public int[] BDecksOGHP = new int[100];
     public int[] BDecksRHP = new int[100];
@@ -43,7 +43,6 @@ public class BattleSystem : MonoBehaviour
 
     UIEffect ue;
     Cardsc csc;
-    CardScripts CCode;
 
     void Start()
     {
@@ -55,7 +54,6 @@ public class BattleSystem : MonoBehaviour
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
-        CCode = gameObject.GetComponent<CardScripts>();
         for (int i = 0; i < 10; i++)
         {
             CardImage[i].SetActive(false);
@@ -252,7 +250,7 @@ public class BattleSystem : MonoBehaviour
                 break;
             }
         }
-        for (int i = 0; i < 8; i++)
+        for (int i = Startnum; i < 9; i++)
         {
             if (Cards[i] == "" && Cards[i + 1] != "")
             {
@@ -386,11 +384,6 @@ public class BattleSystem : MonoBehaviour
             rt[8].localPosition = new Vector3(CardPosition - 210, -350, 0);
             rt[9].localPosition = new Vector3(CardPosition - 270, -350, 0);
         }
-    }
-
-    void Field()
-    {
-    CCode.CardCode
     }
 
 
