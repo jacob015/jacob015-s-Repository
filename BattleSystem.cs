@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattleSystem : MonoBehaviour
+public class BattleSystem : MonoBehaviour 
 {
     public Text Decktxt;
     public GameObject[] CardImage = new GameObject[10];
@@ -13,21 +13,27 @@ public class BattleSystem : MonoBehaviour
     public int[] DecksPower = new int[100];
     public int[] DecksHP = new int[100];
 
-    public string[] BDecks = new string[100];
-    public int[] BDecksOGCost = new int[100];
-    public int[] BDecksRCost = new int[100];
-    public int[] BDecksOGPower = new int[100];
-    public int[] BDecksRPower = new int[100];
-    public int[] BDecksOGHP = new int[100];
-    public int[] BDecksRHP = new int[100];
 
-    public string[] Cards = new string[10];
-    public int[] CardsOGCost = new int[10];
-    public int[] CardsRCost = new int[10];
-    public int[] CardsOGPower = new int[10];
-    public int[] CardsRPower = new int[10];
-    public int[] CardsOGHP = new int[10];
-    public int[] CardsRHP = new int[10];
+
+    public struct Card
+    {
+        public string Cards;
+        public int CardsOGCost;
+        public int CardsRCost;
+        public int CardsOGPower;
+        public int CardsRPower;
+        public int CardsOGHP;
+        public int CardsRHP;
+    }
+
+    //public struct CardC
+    //{
+    //    public int CardCode;//몬스터의 코드
+    //    public int MonsterHp;//몬스터의 체력 HpSystem
+    //    public int MonsterPower;//몬스터의 공격력
+    //    public int MonsterCost;
+    //    public int MonsterDamageType; //몬스터의 대미지 타입 1:물리2:마법3:고정4:혼합
+    //}
 
     public int Energy;
     public Text EnergyTxt;
@@ -41,8 +47,16 @@ public class BattleSystem : MonoBehaviour
     public bool PlayerTurn = true; //첫턴은 항상 플레이어의 우선 나중에 수정 가능
     float AATC; //경고문 알파 값 변경
 
+    public Image TurnButton;
+    bool CarduseCant;
+
     UIEffect ue;
     Cardsc csc;
+    CardScripts CCode;
+    public Card[] Hand = new Card[10];
+    public Card[] BDeck = new Card[100];
+
+    
 
     void Start()
     {
@@ -54,6 +68,7 @@ public class BattleSystem : MonoBehaviour
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
+        CCode = gameObject.GetComponent<CardScripts>();
         for (int i = 0; i < 10; i++)
         {
             CardImage[i].SetActive(false);
@@ -72,18 +87,18 @@ public class BattleSystem : MonoBehaviour
         }
         for (int i = 0; i < deckcards; i++)
         {
-            BDecks[i] = Decks[i];
-            BDecksOGCost[i] = DecksCost[i];
-            BDecksRCost[i] = BDecksOGCost[i];
-            BDecksOGPower[i] = DecksPower[i];
-            BDecksRPower[i] = BDecksOGPower[i];
-            BDecksOGHP[i] = DecksHP[i];
-            BDecksRHP[i] = BDecksOGHP[i];
+            BDeck[i].Cards = Decks[i];
+            BDeck[i].CardsOGCost = DecksCost[i];
+            BDeck[i].CardsRCost = BDeck[i].CardsOGCost;
+            BDeck[i].CardsOGPower = DecksPower[i];
+            BDeck[i].CardsRPower = BDeck[i].CardsOGPower;
+            BDeck[i].CardsOGHP = DecksHP[i];
+            BDeck[i].CardsRHP = BDeck[i].CardsOGHP;
         }
     }
     public void CardUse(int cardnum)
     {
-        if (CardsRCost[cardnum] > Energy)
+        if (Hand[cardnum].CardsRCost > Energy)
         {
             Announce.text = "에너지가 부족하여 카드를 사용할 수 없습니다!";
             StopCoroutine("AnnounceAppear");
@@ -93,18 +108,18 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
-            Energy -= CardsRCost[cardnum];
-            if (Cards[cardnum] == "10001")
+            Energy -= Hand[cardnum].CardsRCost;
+            if (Hand[cardnum].Cards == "10001")
             {
-                Energy += CardsRPower[cardnum];
+                Energy += Hand[cardnum].CardsRPower;
             }
-            Cards[cardnum] = "";
-            CardsOGCost[cardnum] = 0;
-            CardsRCost[cardnum] = 0;
-            CardsOGPower[cardnum] = 0;
-            CardsRPower[cardnum] = 0;
-            CardsOGHP[cardnum] = 0;
-            CardsRHP[cardnum] = 0;
+            Hand[cardnum].Cards = "";
+            Hand[cardnum].CardsOGCost = 0;
+            Hand[cardnum].CardsRCost = 0;
+            Hand[cardnum].CardsOGPower = 0;
+            Hand[cardnum].CardsRPower = 0;
+            Hand[cardnum].CardsOGHP = 0;
+            Hand[cardnum].CardsRHP = 0;
             HandCount--;
             CardImage[cardnum].SetActive(false);
             CardReload(cardnum);
@@ -118,6 +133,22 @@ public class BattleSystem : MonoBehaviour
                 CardImage[i].SetActive(false);
             }
         }
+        for (int i = 0; i < 10; i++)
+        {
+            if (Hand[i].Cards != "")
+            {
+                if (Hand[i].CardsRCost <= Energy)
+                {
+                    CarduseCant = false;
+                    break;
+                }
+            }
+            else
+            {
+                CarduseCant = true;
+                break;
+            }
+        }
         csc.CardReloading();
     }
     public void CardDraw()
@@ -126,31 +157,25 @@ public class BattleSystem : MonoBehaviour
         for (int i = 0; i < 10; i++)
         {
             int b = Random.Range(0, deckcards);
-            if (BDecks[b] != "")
+            if (BDeck[b].Cards != "")
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    if (Cards[j] == "")
+                    if (Hand[j].Cards == "")
                     {
                         Cardsc csc = gameObject.GetComponent<Cardsc>();
-                        Cards[j] = BDecks[b];
-                        CardsOGCost[j] = BDecksOGCost[b];
-                        CardsRCost[j] = BDecksRCost[b];
-                        CardsOGPower[j] = BDecksOGPower[b];
-                        CardsRPower[j] = BDecksRPower[b];
-                        CardsOGHP[j] = BDecksOGHP[b];
-                        CardsRHP[j] = BDecksRHP[b];
-                        csc.Costs[j].text = "" + CardsRCost[j];
-                        csc.Power[j].text = "" + CardsRPower[j];
+                        Hand[j] = BDeck[b];
+                        csc.Costs[j].text = "" + Hand[j].CardsRCost;
+                        csc.Power[j].text = "" + Hand[j].CardsRPower;
                         Text tx = csc.HPgo[j].GetComponent<Text>();
-                        tx.text = "" + CardsRHP[j];
-                        BDecks[b] = "";
-                        BDecksOGCost[b] = 0;
-                        BDecksRCost[b] = 0;
-                        BDecksOGPower[b] = 0;
-                        BDecksRPower[b] = 0;
-                        BDecksOGHP[b] = 0;
-                        BDecksRHP[b] = 0;
+                        tx.text = "" + Hand[j].CardsRHP;
+                        BDeck[b].Cards = "";
+                        BDeck[b].CardsOGCost = 0;
+                        BDeck[b].CardsRCost = 0;
+                        BDeck[b].CardsOGPower = 0;
+                        BDeck[b].CardsRPower = 0;
+                        BDeck[b].CardsOGHP = 0;
+                        BDeck[b].CardsRHP = 0;
                         CardReload(b);
                         HandCount++;
                         ue.CardDrowEffect(j+1);
@@ -158,15 +183,15 @@ public class BattleSystem : MonoBehaviour
                         deckcards--;
                         break;
                     }
-                    else if (Cards[9] != "")
+                    else if (Hand[9].Cards != "")
                     {
-                        BDecks[b] = "";
-                        BDecksOGCost[b] = 0;
-                        BDecksRCost[b] = 0;
-                        BDecksOGPower[b] = 0;
-                        BDecksRPower[b] = 0;
-                        BDecksOGHP[b] = 0;
-                        BDecksRHP[b] = 0;
+                        BDeck[b].Cards = "";
+                        BDeck[b].CardsOGCost = 0;
+                        BDeck[b].CardsRCost = 0;
+                        BDeck[b].CardsOGPower = 0;
+                        BDeck[b].CardsRPower = 0;
+                        BDeck[b].CardsOGHP = 0;
+                        BDeck[b].CardsRHP = 0;
                         Announce.text = "카드를 더 이상 뽑을 수 없어 카드가 소멸됩니다.";
                         StopCoroutine("AnnounceAppear");
                         StopCoroutine("AnnounceDisappear");
@@ -178,7 +203,7 @@ public class BattleSystem : MonoBehaviour
                     }
                 }
             }
-            else if (BDecks[0] == "")
+            else if (BDeck[0].Cards == "")
             {
                 Announce.text = "덱에 카드가 없어 피해를 받습니다!";
                 StopCoroutine("AnnounceAppear");
@@ -188,6 +213,11 @@ public class BattleSystem : MonoBehaviour
             }
             break;
         }
+    }
+
+    void BattleField()
+    {
+
     }
 
     IEnumerator AnnounceAppear()
@@ -228,59 +258,59 @@ public class BattleSystem : MonoBehaviour
         csc.CardReloading();
         for (int i = Startnum; i >= 0; i++)
         {
-            if (BDecks[i] == "" && BDecks[i + 1] != "")
+            if (BDeck[i].Cards == "" && BDeck[i + 1].Cards != "")
             {
-                BDecks[i] = BDecks[i + 1];
-                BDecksOGCost[i] = BDecksOGCost[i + 1];
-                BDecksRCost[i] = BDecksRCost[i + 1];
-                BDecksOGPower[i] = BDecksOGPower[i + 1];
-                BDecksRPower[i] = BDecksRPower[i + 1];
-                BDecksOGHP[i] = BDecksOGHP[i + 1];
-                BDecksRHP[i] = BDecksRHP[i + 1];
-                BDecks[i + 1] = "";
-                BDecksOGCost[i + 1] = 0;
-                BDecksRCost[i + 1] = 0;
-                BDecksOGPower[i + 1] = 0;
-                BDecksRPower[i + 1] = 0;
-                BDecksOGHP[i + 1] = 0;
-                BDecksRHP[i + 1] = 0;
+                BDeck[i].Cards = BDeck[i + 1].Cards;
+                BDeck[i].CardsOGCost = BDeck[i + 1].CardsOGCost;
+                BDeck[i].CardsRCost = BDeck[i + 1].CardsRCost;
+                BDeck[i].CardsOGPower = BDeck[i + 1].CardsOGPower;
+                BDeck[i].CardsRPower = BDeck[i + 1].CardsRPower;
+                BDeck[i].CardsOGHP = BDeck[i + 1].CardsOGHP;
+                BDeck[i].CardsRHP = BDeck[i + 1].CardsRHP;
+                BDeck[i + 1].Cards = "";
+                BDeck[i + 1].CardsOGCost = 0;
+                BDeck[i + 1].CardsRCost = 0;
+                BDeck[i + 1].CardsOGPower = 0;
+                BDeck[i + 1].CardsRPower = 0;
+                BDeck[i + 1].CardsOGHP = 0;
+                BDeck[i + 1].CardsRHP = 0;
             }
-            else if (BDecks[i] == "" && BDecks[i + 1] == "")
+            else if (BDeck[i].Cards == "" && BDeck[i + 1].Cards == "")
             {
                 break;
             }
         }
         for (int i = Startnum; i < 9; i++)
         {
-            if (Cards[i] == "" && Cards[i + 1] != "")
+            if (Hand[i].Cards == "" && Hand[i + 1].Cards != "")
             {
-                Cards[i] = Cards[i + 1];
-                CardsOGCost[i] = CardsOGCost[i + 1];
-                CardsRCost[i] = CardsRCost[i + 1];
-                CardsOGPower[i] = CardsOGPower[i + 1];
-                CardsRPower[i] = CardsRPower[i + 1];
-                CardsOGHP[i] = CardsOGHP[i + 1];
-                CardsRHP[i] = CardsRHP[i + 1];
-                Cards[i + 1] = "";
-                CardsOGCost[i + 1] = 0;
-                CardsRCost[i + 1] = 0;
-                CardsOGPower[i + 1] = 0;
-                CardsRPower[i + 1] = 0;
-                CardsOGHP[i + 1] = 0;
-                CardsRHP[i + 1] = 0;
+                Hand[i].Cards = Hand[i + 1].Cards;
+                Hand[i].CardsOGCost = Hand[i + 1].CardsOGCost;
+                Hand[i].CardsRCost = Hand[i + 1].CardsRCost;
+                Hand[i].CardsOGPower = Hand[i + 1].CardsOGPower;
+                Hand[i].CardsRPower = Hand[i + 1].CardsRPower;
+                Hand[i].CardsOGHP = Hand[i + 1].CardsOGHP;
+                Hand[i].CardsRHP = Hand[i + 1].CardsRHP;
+                Hand[i + 1].Cards = "";
+                Hand[i + 1].CardsOGCost = 0;
+                Hand[i + 1].CardsRCost = 0;
+                Hand[i + 1].CardsOGPower = 0;
+                Hand[i + 1].CardsRPower = 0;
+                Hand[i + 1].CardsOGHP = 0;
+                Hand[i + 1].CardsRHP = 0;
             }
         }
     }
     public void CardGain(string Card, int Cost, int Power, int HP)
     {
         csc.CardReloading();
-        BDecks[deckcards] = Card;
-        BDecksOGCost[deckcards] = Cost;
-        BDecksRCost[deckcards] = Cost;
-        BDecksOGPower[deckcards] = Power;
-        BDecksRPower[deckcards] = Power;
-        BDecksOGHP[deckcards] = HP;
-        BDecksRHP[deckcards] = HP;
+        BDeck[deckcards].Cards = Card;
+        BDeck[deckcards].CardsOGCost = Cost;
+        BDeck[deckcards].CardsRCost = Cost;
+        BDeck[deckcards].CardsOGPower = Power;
+        BDeck[deckcards].CardsRPower = Power;
+        BDeck[deckcards].CardsOGHP = HP;
+        BDeck[deckcards].CardsRHP = HP;
         deckcards++;
     }
 
@@ -386,7 +416,6 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
-
     void Update()
     {
         Decktxt.text = "" + deckcards;
@@ -400,7 +429,7 @@ public class BattleSystem : MonoBehaviour
             Decktxt.color = Color.white;
         }
 
-        if (PlayerTurn == true)
+        if (PlayerTurn)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -411,9 +440,19 @@ public class BattleSystem : MonoBehaviour
                 CardGain("10001", 1, 5, 0);
             }
             //TurnOver();
+            
+            if (CarduseCant)
+            {
+                TurnButton.sprite = Resources.Load<Sprite>("Sprites/UIs/TurnEnd_On");
+            }
+            else
+            {
+                TurnButton.sprite = Resources.Load<Sprite>("Sprites/UIs/TurnEnd_Off");
+            }
         }
-        else if (PlayerTurn == false)
+        else
         {
+            TurnButton.sprite = Resources.Load<Sprite>("Sprites/UIs/TurnEnemy");
             //플레이어 턴이 아니더라도 카드에 대응 할 수 있게 만들것
         }
     }
