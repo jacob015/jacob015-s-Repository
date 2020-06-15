@@ -13,7 +13,9 @@ public class Cardsc : MonoBehaviour
     public Text[] Power = new Text[10];
     public GameObject[] HPgo = new GameObject[10]; //스킬 카드는 체력이 없으므로, Setactive false하기 위해 옵젝으로 저장
     Text[] HP = new Text[10];
-
+    
+    BattleSystem battleSystem = GameObject.Find("Systems").GetComponent<BattleSystem>();
+ 
     public GameObject LookCards;
     bool isOn;
     Image lookimg;
@@ -76,6 +78,8 @@ public class Cardsc : MonoBehaviour
     public void DragEnd(GameObject go)
     {
         cardmoving = false;
+        if (battlesystem.PlayerTurn == true)
+        {
         if (!carduseReady) //이 if문 밖에 하나 더 넣어 내 턴일 때만 실행되도록
         {
             go.transform.localPosition = moveBefore;
@@ -83,6 +87,7 @@ public class Cardsc : MonoBehaviour
         else if (carduseReady)
         {
             bs.CardUse(moveCardnum);
+        }
         }
     }
 
