@@ -91,7 +91,7 @@ public class Cardsc : MonoBehaviour
         if (cardmoving)
         {
             Cardstr[moveCardnum].localPosition = new Vector3(Input.mousePosition.x - 641.7f, Input.mousePosition.y - 417.8f, 0f);
-            if (Cardstr[moveCardnum].localPosition.y >= moveBefore.y + 250f)
+            if (Cardstr[moveCardnum].localPosition.y >= moveBefore.y + 250f) //이 조건 안에 && 내 턴일 경우도 넣어주세요
             {
                 carduseReady = true;
                 GameObject go = Instantiate(Resources.Load("Prefabs/Effects/Stars"), Cardstr[moveCardnum]) as GameObject;
