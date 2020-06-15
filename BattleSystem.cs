@@ -26,14 +26,14 @@ public class BattleSystem : MonoBehaviour
         public int CardsRHP;
     }
 
-    //public struct CardC
-    //{
-    //    public int CardCode;//몬스터의 코드
-    //    public int MonsterHp;//몬스터의 체력 HpSystem
-    //    public int MonsterPower;//몬스터의 공격력
-    //    public int MonsterCost;
-    //    public int MonsterDamageType; //몬스터의 대미지 타입 1:물리2:마법3:고정4:혼합
-    //}
+    public struct BCard
+    {
+        public string CardCode;//몬스터의 코드
+        public int MonsterHp;//몬스터의 체력 HpSystem
+        public int MonsterPower;//몬스터의 공격력
+        public int MonsterCost;
+        public int MonsterDamageType; //몬스터의 대미지 타입 1:물리2:마법3:고정4:혼합
+    }
 
     public int Energy;
     public Text EnergyTxt;
@@ -53,6 +53,7 @@ public class BattleSystem : MonoBehaviour
     UIEffect ue;
     Cardsc csc;
     CardScripts CCode;
+    public BCard[] InfCard = new BCard[100];
     public Card[] Hand = new Card[10];
     public Card[] BDeck = new Card[100];
 
@@ -65,6 +66,7 @@ public class BattleSystem : MonoBehaviour
         Announce.color = color;
         AATC = 0;
         DeckSame();
+        CopyState();
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
@@ -74,6 +76,22 @@ public class BattleSystem : MonoBehaviour
             CardImage[i].SetActive(false);
         }
     }
+    public void CopyState()
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            InfCard[i].CardCode = CCode.CardState[i].CardCode;
+            InfCard[i].MonsterCost = CCode.CardState[i].MonsterCost;
+            InfCard[i].MonsterDamageType = CCode.CardState[i].MonsterDamageType;
+            InfCard[i].MonsterHp = CCode.CardState[i].MonsterHp;
+            InfCard[i].MonsterPower = CCode.CardState[i].MonsterPower;
+        }
+        Decks[0] = InfCard[0].CardCode;
+        DecksCost[0] = InfCard[0].MonsterCost;
+        DecksPower[0] = InfCard[0].MonsterPower;
+        DecksHP[0] = InfCard[0].MonsterHp;
+    }
+
 
     public void DeckSame()
     {
