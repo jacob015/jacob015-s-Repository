@@ -18,7 +18,7 @@ public class CardScripts : MonoBehaviour
     {
     CardState[Spider].CardCode = 0;
     CardState[Spider].MonsterHp = 2;
-    CardState[Spider].MonstrrPower = 1;
+    CardState[Spider].MonsterPower = 1;
     CardState[Spider].MonsterDamageType = 1;
     }
     
