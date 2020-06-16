@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,13 +13,10 @@ public class HpSystem : MonoBehaviour {
     private void Start()
     {
         for (int i = 0; i < 100; i++)
-        PlayerMonsterHp[CardScripts.CardCode[i]] = CardScripts.MonsterHp[CardScripts.CardCode[i]];
+        //PlayerMonsterHp[CardScripts.CardCode[i]] = CardScripts.MonsterHp[CardScripts.CardCode[i]];
+        //이 구문에 오류가 있습니다. 확인 바람.
 
         PlayerHp[0] = 80;
-        DamageSystem damage;
-        damage.MonsterPower[0] = 1;
-        
-        
     }
 
 
