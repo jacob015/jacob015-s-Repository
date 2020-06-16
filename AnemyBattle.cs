@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +16,11 @@ public class AnemyBattle : MonoBehaviour
     {
         if(EnemyTurn == true)
         {
-            TurnOver();
+            //TurnOver();
         }
         else if(EnemyTurn == false)
         {
-            //플레이어의 턴이라도 적은 패턴을 통해 플레이어의 공격에 대응할 것ㅋㅋㅋ
+            //플레이어의 턴이라도 적은 패턴을 통해 플레이어의 공격에 대응할 것
         }
     }
 
