@@ -11,11 +11,9 @@ public class Cardsc : MonoBehaviour
     public Image[] Cards = new Image[10];
     public Text[] Costs = new Text[10];
     public Text[] Power = new Text[10];
-    public GameObject[] HPgo = new GameObject[10]; //스킬 카드는 체력이 없으므로, Setactive false하기 위해 옵젝으로 저장
+    public GameObject[] HPgo = new GameObject[10];
     Text[] HP = new Text[10];
-    
-    BattleSystem battleSystem = GameObject.Find("Systems").GetComponent<BattleSystem>();
- 
+
     public GameObject LookCards;
     bool isOn;
     Image lookimg;
@@ -36,7 +34,7 @@ public class Cardsc : MonoBehaviour
 
     void Start()
     {
-        bs = GameObject.Find("Systems").GetComponent<BattleSystem>();
+        bs = gameObject.GetComponent<BattleSystem>();
         lookimg = LookCards.GetComponent<Image>();
         LHP = LHPgo.GetComponent<Text>();
         LookCards.SetActive(false);
@@ -78,16 +76,13 @@ public class Cardsc : MonoBehaviour
     public void DragEnd(GameObject go)
     {
         cardmoving = false;
-        if (battlesystem.PlayerTurn == true)
-        {
-        if (!carduseReady) //이 if문 밖에 하나 더 넣어 내 턴일 때만 실행되도록
+        if (!carduseReady)
         {
             go.transform.localPosition = moveBefore;
         }
-        else if (carduseReady)
+        else if (carduseReady && bs.PlayerTurn)
         {
             bs.CardUse(moveCardnum);
-        }
         }
     }
 
@@ -96,7 +91,7 @@ public class Cardsc : MonoBehaviour
         if (cardmoving)
         {
             Cardstr[moveCardnum].localPosition = new Vector3(Input.mousePosition.x - 641.7f, Input.mousePosition.y - 417.8f, 0f);
-            if (Cardstr[moveCardnum].localPosition.y >= moveBefore.y + 250f) //이 조건 안에 && 내 턴일 경우도 넣어주세요
+            if (Cardstr[moveCardnum].localPosition.y >= moveBefore.y + 250f && bs.PlayerTurn)
             {
                 carduseReady = true;
                 GameObject go = Instantiate(Resources.Load("Prefabs/Effects/Stars"), Cardstr[moveCardnum]) as GameObject;
@@ -136,7 +131,7 @@ public class Cardsc : MonoBehaviour
             LPower.color = Power[CardOnNum].color;
             LHP.text = HP[CardOnNum].text;
             LHP.color = HP[CardOnNum].color;
-            if (int.Parse(bs.Cards[CardOnNum]) < 20000)
+            if (int.Parse(bs.Hand[CardOnNum].Cards) < 20000)
             {
                 LHPgo.SetActive(false);
             }
@@ -154,7 +149,7 @@ public class Cardsc : MonoBehaviour
     {
         if (scal < 1f)
         {
-            scal += 0.05f;
+            scal += 0.08f;
             RectTransform tr = LookCards.GetComponent<RectTransform>();
             tr.localScale = new Vector3(scal, scal, 1f);
             yield return new WaitForSeconds(0.002f);
@@ -164,11 +159,11 @@ public class Cardsc : MonoBehaviour
 
     public void CardReloading()
     {
-        for (int b = 0; b < bs.Cards.Length; b++)
+        for (int b = 0; b < bs.Hand.Length; b++)
         {
-            if (bs.Cards[b] != "")
+            if (bs.Hand[b].Cards != null)
             {
-                if (int.Parse(bs.Cards[b]) < 20000)
+                if (int.Parse(bs.Hand[b].Cards) < 20000)
                 {
                     HPgo[b].SetActive(false);
                 }
@@ -178,13 +173,13 @@ public class Cardsc : MonoBehaviour
                 }
             }
 
-            Costs[b].text = "" + bs.CardsRCost[b];
-            Power[b].text = "" + bs.CardsRPower[b];
-            HP[b].text = "" + bs.CardsRHP[b];
+            Costs[b].text = "" + bs.Hand[b].CardsRCost;
+            Power[b].text = "" + bs.Hand[b].CardsRPower;
+            HP[b].text = "" + bs.Hand[b].CardsRHP;
 
-            if (bs.CardsRCost[b] == bs.CardsOGCost[b])
+            if (bs.Hand[b].CardsRCost == bs.Hand[b].CardsOGCost)
             {
-                if (bs.CardsRCost[b] > bs.Energy)
+                if (bs.Hand[b].CardsRCost > bs.Energy)
                 {
                     Costs[b].color = Color.red;
                 }
@@ -193,13 +188,13 @@ public class Cardsc : MonoBehaviour
                     Costs[b].color = Color.white;
                 }
             }
-            else if (bs.CardsRCost[b] > bs.CardsOGCost[b])
+            else if (bs.Hand[b].CardsRCost > bs.Hand[b].CardsOGCost)
             {
                 Costs[b].color = Color.red;
             }
-            else if (bs.CardsRCost[b] < bs.CardsOGCost[b])
+            else if (bs.Hand[b].CardsRCost < bs.Hand[b].CardsOGCost)
             {
-                if (bs.CardsRCost[b] > bs.Energy)
+                if (bs.Hand[b].CardsRCost > bs.Energy)
                 {
                     Costs[b].color = Color.red;
                 }
@@ -207,28 +202,28 @@ public class Cardsc : MonoBehaviour
                     Costs[b].color = Color.green;
             }
 
-            if (bs.CardsRPower[b] == bs.CardsOGPower[b])
+            if (bs.Hand[b].CardsRPower == bs.Hand[b].CardsOGPower)
             {
                 Power[b].color = Color.white;
             }
-            else if (bs.CardsRPower[b] > bs.CardsOGPower[b])
+            else if (bs.Hand[b].CardsRPower > bs.Hand[b].CardsOGPower)
             {
                 Power[b].color = Color.green;
             }
-            else if (bs.CardsRPower[b] < bs.CardsOGPower[b])
+            else if (bs.Hand[b].CardsRPower < bs.Hand[b].CardsOGPower)
             {
                 Power[b].color = Color.red;
             }
 
-            if (bs.CardsRHP[b] == bs.CardsOGHP[b])
+            if (bs.Hand[b].CardsRHP == bs.Hand[b].CardsOGHP)
             {
                 HP[b].color = Color.white;
             }
-            else if (bs.CardsRHP[b] > bs.CardsOGHP[b])
+            else if (bs.Hand[b].CardsRHP > bs.Hand[b].CardsOGHP)
             {
                 HP[b].color = Color.green;
             }
-            else if (bs.CardsRHP[b] < bs.CardsOGHP[b])
+            else if (bs.Hand[b].CardsRHP < bs.Hand[b].CardsOGHP)
             {
                 HP[b].color = Color.red;
             }
@@ -237,11 +232,11 @@ public class Cardsc : MonoBehaviour
             //첫 번째 숫자 : 카드 종류 - 1 : 스킬 / 2 : 탐험대원 등등...
             //두 번째 숫자 : 탐험대 종류 - 00 : 공용 / 01 : 화염 등등...
             //세 번째 숫자 : 만들어진 순서
-            if (bs.Cards[b] == "10001")
+            if (bs.Hand[b].Cards == "10001")
             {
                 Cards[b].sprite = Resources.Load<Sprite>("Sprites/Cards/JustCard");
             }
-            else if (bs.Cards[b] == "20001")
+            else if (bs.Hand[b].Cards == "20001")
             {
                 Cards[b].sprite = Resources.Load<Sprite>("Sprites/Cards/JustUnit");
             }
