@@ -3,21 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HpSystem : MonoBehaviour {
+public class Sommon : MonoBehaviour {
 
-    public static int[] PlayerHp = new int[5];
-    public static int[] EnemyHp = new int[15];
-    public int[] PlayerMonsterHp = new int[100];
-    public int[] EnemyMonsterHp = new int[100];
+    public GameObject SommonMonster;
+    public struct Monster
+    {
+        public string Cards;
+        public int CardsOGCost;
+        public int CardsRCost;
+        public int CardsOGPower;
+        public int CardsRPower;
+        public int CardsOGHP;
+        public int CardsRHP;
+    }
+
+    BattleSystem batsys;
+    public Monster monster;
 
     private void Start()
     {
-        for (int i = 0; i < 100; i++)
-        //PlayerMonsterHp[CardScripts.CardCode[i]] = CardScripts.MonsterHp[CardScripts.CardCode[i]];
-        //이 구문에 오류가 있습니다. 확인 바람.
-
-        PlayerHp[0] = 80;
+        SommonMonster.SetActive(false);
+        batsys = gameObject.GetComponent<BattleSystem>();
     }
 
+    public void MonSys(int cardnum)
+    {
+        monster.Car
+        monster.CardsOGHP = batsys.Hand[cardnum].CardsOGHP;
+        monster.CardsRHP = batsys.Hand[cardnum].CardsRHP;
+        monster.CardsOGCost = batsys.Hand[cardnum].CardsOGCost;
+        monster.CardsRCost = batsys.Hand[cardnum].CardsRCost;
+        monster.CardsOGPower = batsys.Hand[cardnum].CardsOGPower;
+        monster.CardsRPower = batsys.Hand[cardnum].CardsRPower;
+    }
+
+    public void BattleField(int cardnum)
+    {
+        MonSys(cardnum);
+
+    }
 
 }
