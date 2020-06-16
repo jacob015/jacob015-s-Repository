@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Sommon : MonoBehaviour {
+public class HpSystem : MonoBehaviour
+{
 
     public GameObject SommonMonster;
     public struct Monster
@@ -22,13 +23,12 @@ public class Sommon : MonoBehaviour {
 
     private void Start()
     {
-        SommonMonster.SetActive(false);
         batsys = gameObject.GetComponent<BattleSystem>();
     }
 
     public void MonSys(int cardnum)
     {
-        monster.Car
+        monster.Cards = batsys.Hand[cardnum].Cards;
         monster.CardsOGHP = batsys.Hand[cardnum].CardsOGHP;
         monster.CardsRHP = batsys.Hand[cardnum].CardsRHP;
         monster.CardsOGCost = batsys.Hand[cardnum].CardsOGCost;
@@ -40,7 +40,21 @@ public class Sommon : MonoBehaviour {
     public void BattleField(int cardnum)
     {
         MonSys(cardnum);
-
+        batsys.FieldCount++;
+        if (batsys.FieldCount == 1)
+        {
+            Instantiate(SommonMonster, transform.position = new Vector3(-324, 115, 0), transform.rotation);
+            batsys.FieldCount++;
+        }
+        else if (batsys.FieldCount == 2)
+        {
+            Instantiate(SommonMonster, transform.position = new Vector3(-238, -13, 0), transform.rotation);
+            batsys.FieldCount++;
+        }
+        else if (batsys.FieldCount == 3)
+        {
+            Instantiate(SommonMonster, transform.position = new Vector3(-324, -160, 0), transform.rotation);
+            batsys.FieldCount = 0;
+        }
     }
-
 }
