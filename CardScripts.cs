@@ -15,7 +15,7 @@ public struct CardC
 public class CardScripts : MonoBehaviour
 {
     public CardC[] CardState = new CardC[100];
-    
+
     //MonsterScripts와 HpSystem과 상호작용 할것
     void Awake()
     {
@@ -35,7 +35,7 @@ public class CardScripts : MonoBehaviour
 
     void Update()
     {
-        
+
 
     }
 
