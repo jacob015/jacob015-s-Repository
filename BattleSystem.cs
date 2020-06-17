@@ -41,10 +41,11 @@ public class BattleSystem : MonoBehaviour
 
     public int CardPosition = 0;
     public int HandCount = 0;
-    public int deckcards;
+    int deckcards;
     public int Turn = 0;
     public bool PlayerTurn; //첫턴은 항상 플레이어의 우선 나중에 수정 가능
     float AATC; //경고문 알파 값 변경
+    public int FieldCount = 0;
 
     public Image TurnButton;
     bool CarduseCant;
@@ -52,6 +53,7 @@ public class BattleSystem : MonoBehaviour
     UIEffect ue;
     Cardsc csc;
     CardScripts CCode;
+    HpSystem sommon;
 
     public BCard[] InfCard = new BCard[100];
     public Card[] Hand = new Card[10];
@@ -65,11 +67,13 @@ public class BattleSystem : MonoBehaviour
         color.a = 0;
         Announce.color = color;
         AATC = 0;
+        CopyState();
         DeckSame();
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
         CCode = gameObject.GetComponent<CardScripts>();
+        sommon = gameObject.GetComponent<HpSystem>();
         for (int i = 0; i < 10; i++)
         {
             CardImage[i].SetActive(false);
@@ -80,7 +84,7 @@ public class BattleSystem : MonoBehaviour
     {
         for (int i = 0; i < 100; i++)
         {
-            InfCard[i].CardCode = CCode.CardState[i].CardCode.ToString();
+            InfCard[i].CardCode = CCode.CardState[i].CardCode;
             InfCard[i].MonsterCost = CCode.CardState[i].MonsterCost;
             InfCard[i].MonsterDamageType = CCode.CardState[i].MonsterDamageType;
             InfCard[i].MonsterHp = CCode.CardState[i].MonsterHp;
@@ -107,14 +111,15 @@ public class BattleSystem : MonoBehaviour
 
     public void DeckSame()
     {
-        for (int i = 0; i < Decks.Length; i++)
+        for (int i = 0; i < 100; i++)
         {
-            if (Decks[i] == null)
+            if (Decks[i] == "")
             {
                 deckcards = i;
                 break;
             }
         }
+        
         for (int i = 0; i < deckcards; i++)
         {
             BDeck[i].Cards = Decks[i];
@@ -143,6 +148,7 @@ public class BattleSystem : MonoBehaviour
             {
                 Energy += Hand[cardnum].CardsRPower;
             }
+            sommon.BattleField(cardnum);
             Hand[cardnum].Cards = null;
             Hand[cardnum].CardsOGCost = 0;
             Hand[cardnum].CardsRCost = 0;
@@ -184,65 +190,64 @@ public class BattleSystem : MonoBehaviour
     public void CardDraw()
     {
         csc.CardReloading();
-        for (int i = 0; i < 10; i++)
+        
+        int b = Random.Range(0, deckcards - 1);
+        if (BDeck[b].Cards != null)
         {
-            int b = Random.Range(0, deckcards);
-            if (BDeck[b].Cards != null)
+            for (int j = 0; j < 10; j++)
             {
-                for (int j = 0; j < 10; j++)
+                if (Hand[j].Cards == null)
                 {
-                    if (Hand[j].Cards == null)
-                    {
-                        Cardsc csc = gameObject.GetComponent<Cardsc>();
-                        Hand[j] = BDeck[b];
-                        csc.Costs[j].text = "" + Hand[j].CardsRCost;
-                        csc.Power[j].text = "" + Hand[j].CardsRPower;
-                        Text tx = csc.HPgo[j].GetComponent<Text>();
-                        tx.text = "" + Hand[j].CardsRHP;
-                        BDeck[b].Cards = null;
-                        BDeck[b].CardsOGCost = 0;
-                        BDeck[b].CardsRCost = 0;
-                        BDeck[b].CardsOGPower = 0;
-                        BDeck[b].CardsRPower = 0;
-                        BDeck[b].CardsOGHP = 0;
-                        BDeck[b].CardsRHP = 0;
-                        CardReload(b);
-                        HandCount++;
-                        ue.CardDrowEffect(j + 1);
-                        HandCard();
-                        deckcards--;
-                        break;
-                    }
-                    else if (Hand[9].Cards != null)
-                    {
-                        BDeck[b].Cards = null;
-                        BDeck[b].CardsOGCost = 0;
-                        BDeck[b].CardsRCost = 0;
-                        BDeck[b].CardsOGPower = 0;
-                        BDeck[b].CardsRPower = 0;
-                        BDeck[b].CardsOGHP = 0;
-                        BDeck[b].CardsRHP = 0;
-                        Announce.text = "카드를 더 이상 뽑을 수 없어 카드가 소멸됩니다.";
-                        StopCoroutine("AnnounceAppear");
-                        StopCoroutine("AnnounceDisappear");
-                        AATC = 0;
-                        StartCoroutine("AnnounceAppear");
-                        CardReload(b);
-                        deckcards--;
-                        break;
-                    }
+                    Cardsc csc = gameObject.GetComponent<Cardsc>();
+                    Hand[j] = BDeck[b];
+                    csc.Costs[j].text = "" + Hand[j].CardsRCost;
+                    csc.Power[j].text = "" + Hand[j].CardsRPower;
+                    Text tx = csc.HPgo[j].GetComponent<Text>();
+                    tx.text = "" + Hand[j].CardsRHP;
+                    BDeck[b].Cards = null;
+                    BDeck[b].CardsOGCost = 0;
+                    BDeck[b].CardsRCost = 0;
+                    BDeck[b].CardsOGPower = 0;
+                    BDeck[b].CardsRPower = 0;
+                    BDeck[b].CardsOGHP = 0;
+                    BDeck[b].CardsRHP = 0;
+                    CardReload(b);
+                    HandCount++;
+                    ue.CardDrowEffect(j + 1);
+                    HandCard();
+                    deckcards--;
+                    break;
+                }
+                else if (Hand[9].Cards != null)
+                {
+                    BDeck[b].Cards = null;
+                    BDeck[b].CardsOGCost = 0;
+                    BDeck[b].CardsRCost = 0;
+                    BDeck[b].CardsOGPower = 0;
+                    BDeck[b].CardsRPower = 0;
+                    BDeck[b].CardsOGHP = 0;
+                    BDeck[b].CardsRHP = 0;
+                    Announce.text = "카드를 더 이상 뽑을 수 없어 카드가 소멸됩니다.";
+                    StopCoroutine("AnnounceAppear");
+                    StopCoroutine("AnnounceDisappear");
+                    AATC = 0;
+                    StartCoroutine("AnnounceAppear");
+                    CardReload(b);
+                    deckcards--;
+                    break;
                 }
             }
-            else if (BDeck[0].Cards == null)
-            {
-                Announce.text = "덱에 카드가 없어 피해를 받습니다!";
-                StopCoroutine("AnnounceAppear");
-                StopCoroutine("AnnounceDisappear");
-                AATC = 0;
-                StartCoroutine("AnnounceAppear");
-            }
-            break;
         }
+        else if (BDeck[0].Cards == null)
+        {
+            Announce.text = "덱에 카드가 없어 피해를 받습니다!";
+            StopCoroutine("AnnounceAppear");
+            StopCoroutine("AnnounceDisappear");
+            AATC = 0;
+            StartCoroutine("AnnounceAppear");
+        }
+            
+        
         for (int i = 0; i < 10; i++)
         {
             if (Hand[i].Cards != null)
