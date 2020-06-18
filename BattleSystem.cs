@@ -1,4 +1,4 @@
-using System.Collections;
+uusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,7 +53,7 @@ public class BattleSystem : MonoBehaviour
     UIEffect ue;
     Cardsc csc;
     CardScripts CCode;
-    HpSystem sommon;
+    Sommon sommon;
 
     public BCard[] InfCard = new BCard[100];
     public Card[] Hand = new Card[10];
@@ -72,8 +72,8 @@ public class BattleSystem : MonoBehaviour
         AnemyBattle anemyBattle = GameObject.Find("Systems").GetComponent<AnemyBattle>();
         ue = gameObject.GetComponent<UIEffect>();
         csc = gameObject.GetComponent<Cardsc>();
-        CCode = gameObject.GetComponent<CardScripts>();
-        sommon = gameObject.GetComponent<HpSystem>();
+        
+        sommon = gameObject.GetComponent<Sommon>();
         for (int i = 0; i < 10; i++)
         {
             CardImage[i].SetActive(false);
@@ -82,6 +82,7 @@ public class BattleSystem : MonoBehaviour
     }
     public void CopyState()
     {
+        CCode = gameObject.GetComponent<CardScripts>();
         for (int i = 0; i < 100; i++)
         {
             InfCard[i].CardCode = CCode.CardState[i].CardCode;
@@ -89,11 +90,12 @@ public class BattleSystem : MonoBehaviour
             InfCard[i].MonsterDamageType = CCode.CardState[i].MonsterDamageType;
             InfCard[i].MonsterHp = CCode.CardState[i].MonsterHp;
             InfCard[i].MonsterPower = CCode.CardState[i].MonsterPower;
+            Decks[i] = InfCard[i].CardCode;
+            DecksCost[i] = InfCard[i].MonsterCost;
+            DecksPower[i] = InfCard[i].MonsterPower;
+            DecksHP[i] = InfCard[i].MonsterHp;
         }
-        Decks[0] = InfCard[0].CardCode;
-        DecksCost[0] = InfCard[0].MonsterCost;
-        DecksPower[0] = InfCard[0].MonsterPower;
-        DecksHP[0] = InfCard[0].MonsterHp;
+        
     }
 
     IEnumerator FirstTurnDrow()
@@ -119,7 +121,7 @@ public class BattleSystem : MonoBehaviour
                 break;
             }
         }
-        
+
         for (int i = 0; i < deckcards; i++)
         {
             BDeck[i].Cards = Decks[i];
@@ -148,7 +150,8 @@ public class BattleSystem : MonoBehaviour
             {
                 Energy += Hand[cardnum].CardsRPower;
             }
-            sommon.BattleField(cardnum);
+            sommon.MonSys(cardnum);
+            sommon.ClickZoneOpen();
             Hand[cardnum].Cards = null;
             Hand[cardnum].CardsOGCost = 0;
             Hand[cardnum].CardsRCost = 0;
@@ -160,7 +163,7 @@ public class BattleSystem : MonoBehaviour
             CardImage[cardnum].SetActive(false);
             CardReload(cardnum);
             HandCard();
-            for(int i = 0; i < HandCount; i++)
+            for (int i = 0; i < HandCount; i++)
             {
                 CardImage[i].SetActive(true);
             }
@@ -190,7 +193,7 @@ public class BattleSystem : MonoBehaviour
     public void CardDraw()
     {
         csc.CardReloading();
-        
+
         int b = Random.Range(0, deckcards - 1);
         if (BDeck[b].Cards != null)
         {
@@ -246,8 +249,8 @@ public class BattleSystem : MonoBehaviour
             AATC = 0;
             StartCoroutine("AnnounceAppear");
         }
-            
-        
+
+
         for (int i = 0; i < 10; i++)
         {
             if (Hand[i].Cards != null)
@@ -525,7 +528,7 @@ public class BattleSystem : MonoBehaviour
             {
                 CardGain("10001", 1, 5, 0);
             }
-            
+
             if (CarduseCant)
             {
                 TurnButton.sprite = Resources.Load<Sprite>("Sprites/UIs/TurnEnd_On");
