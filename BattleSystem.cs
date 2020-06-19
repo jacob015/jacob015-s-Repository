@@ -1,4 +1,4 @@
-uusing System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -150,26 +150,30 @@ public class BattleSystem : MonoBehaviour
             {
                 Energy += Hand[cardnum].CardsRPower;
             }
-            sommon.MonSys(cardnum);
-            sommon.ClickZoneOpen();
-            Hand[cardnum].Cards = null;
-            Hand[cardnum].CardsOGCost = 0;
-            Hand[cardnum].CardsRCost = 0;
-            Hand[cardnum].CardsOGPower = 0;
-            Hand[cardnum].CardsRPower = 0;
-            Hand[cardnum].CardsOGHP = 0;
-            Hand[cardnum].CardsRHP = 0;
+            sommon.TurnStart = true;
             HandCount--;
             CardImage[cardnum].SetActive(false);
-            CardReload(cardnum);
+            sommon.MonSys(cardnum);
+            sommon.ClickZoneOpen();
             HandCard();
-            for (int i = 0; i < HandCount; i++)
+            //Hand[cardnum].Cards = null;
+            //Hand[cardnum].CardsOGCost = 0;
+            //Hand[cardnum].CardsRCost = 0;
+            //Hand[cardnum].CardsOGPower = 0;
+            //Hand[cardnum].CardsRPower = 0;
+            //Hand[cardnum].CardsOGHP = 0;
+            //Hand[cardnum].CardsRHP = 0;
+            if (sommon.SommonSuccess == true)
             {
-                CardImage[i].SetActive(true);
-            }
-            for (int i = HandCount; i < 10; i++)
-            {
-                CardImage[i].SetActive(false);
+                CardReload(cardnum);
+                for (int i = 0; i < HandCount; i++)
+                {
+                    CardImage[i].SetActive(true);
+                }
+                for (int i = HandCount; i < 10; i++)
+                {
+                    CardImage[i].SetActive(false);
+                }
             }
         }
         for (int i = 0; i < 10; i++)
